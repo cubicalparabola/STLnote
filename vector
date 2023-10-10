@@ -1,0 +1,73 @@
+#include<iostream>
+#include<stdexcept> // 引入异常处理库
+using namespace std;
+
+template <typename T>
+class Vector {
+    T* arr;
+    int capacity;
+    int current;//元素数量
+public:
+    Vector() {
+        arr = new T[1];
+        capacity = 1;
+        current = 0;
+    }//构造函数
+
+    void push(T data) {
+        if (current == capacity) {
+            T* temp = new T[static_cast<size_t>(capacity) * 2];//扩容
+            for (int i = 0; i < capacity; i++) {
+                temp[i] = arr[i];
+            }//把arr的内容复制到temp里
+            delete[] arr;//原来的arr释放掉
+            capacity *= 2;
+            arr = temp;
+        }
+        arr[current] = data;
+        current++;
+    }//尾部添加
+
+    void pop() {
+        if (current == 0) {
+            throw underflow_error("Vector is empty. Can't pop");
+        }
+        current--;
+    }//移除尾部
+
+    T get(int index) {
+        if (index < current) {
+            return arr[index];
+        }
+        throw out_of_range("Index out of range");
+    }//随机读取
+
+    int size() {
+        return current;
+    }//获取数量
+
+    int get_capacity() {
+        return capacity;
+    }//获取容量
+};
+
+int main() {
+    try {
+        Vector<int> v;
+        v.push(10);
+        v.push(20);
+        v.push(30);
+
+        cout << "Vector size : " << v.size() << endl;
+        cout << "Vector capacity : " << v.get_capacity() << endl;
+        cout << "Vector elements : ";
+        for (int i = 0; i < v.size(); i++) {
+            cout << v.get(i) << " ";
+        }
+    }
+    catch (const exception& e) { // 捕获所有异常
+        cerr << "Caught exception: " << e.what() << endl;
+    }
+
+    return 0;
+}
