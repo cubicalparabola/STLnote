@@ -1,0 +1,73 @@
+#include<iostream>
+#include<stdexcept>
+using namespace std;
+
+template <typename T>
+class Queue {
+    T* array;
+    int front;
+    int rear;
+    int capacity;
+
+public:
+    Queue(int size) {
+        if (size <= 0) {
+            throw invalid_argument("Size must be greater than 0");
+        }
+        front = 0;
+        rear = -1;
+        capacity = size;
+        array = new T[capacity];
+    }//构造函数
+
+    bool empty() {
+        return (rear < front);
+    }//判断空队
+
+    bool isFull() {
+        return (rear == capacity - 1);
+    }//判断满队
+
+    void push(T item) {
+        if (isFull()) {
+            throw overflow_error("Queue is full. Can't enqueue");
+        }
+        array[++rear] = item;
+        cout << item << " enqueued to queue\n";
+    }//元素入队
+
+    T pop() {
+        if (empty()) {
+            throw underflow_error("Queue is empty. Can't dequeue");
+        }
+        return array[front++];
+    }//元素出队
+
+    T getFront() {
+        if (empty()) {
+            throw underflow_error("Queue is empty. Can't peek");
+        }
+        return array[front];
+    }//获取队首
+
+    T getBack() {
+        if (empty()) {
+            throw underflow_error("Queue is empty. Can't get back");
+        }
+        return array[rear];
+    }//获取队尾
+};
+
+int main() {
+    try {
+        Queue<int> queue(2);
+        queue.push(10);
+        queue.push(20);
+        queue.push(30);
+        cout << queue.pop() << " dequeued from queue\n";
+    }
+    catch (const exception& e) { // 捕获所有异常
+        cerr << "Caught exception: " << e.what() << endl;
+    }
+    return 0;
+}
