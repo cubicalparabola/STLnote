@@ -1,0 +1,152 @@
+#include<iostream>
+#include<stdexcept> // 引入异常处理库
+using namespace std;
+
+template <typename T>
+class Node {
+public:
+    T data;
+    Node* next;
+    Node* prev;
+
+    Node(T data, Node* next = NULL, Node* prev = NULL) : data(data), next(next), prev(prev) {}
+};//节点
+
+template <typename T>
+class List {
+    Node<T>* head;
+    Node<T>* tail;
+public:
+    List() : head(NULL), tail(NULL) {}
+
+    bool isEmpty() {
+        return (head == NULL);
+    }//判断空表
+
+    void push_front(T data) {
+        Node<T>* newNode = new Node<T>(data, head);
+        if (isEmpty()) {
+            tail = newNode;
+        }
+        else {
+            head->prev = newNode;
+        }
+        head = newNode;
+    }//添加表头
+
+    void push_back(T data) {
+        Node<T>* newNode = new Node<T>(data, NULL, tail);
+        if (isEmpty()) {
+            head = newNode;
+        }
+        else {
+            tail->next = newNode;
+        }
+        tail = newNode;
+    }//添加表尾
+
+    void pop_front() {
+        if (isEmpty()) {
+            throw underflow_error("List is empty. Can't pop");
+        }
+        Node<T>* temp = head;
+        head = head->next;
+        if (head != NULL) {
+            head->prev = NULL;
+        }
+        else {//原来的表只有一个元素
+            tail = NULL;
+        }
+        delete temp;
+    }//删除表头
+
+    void pop_back() {
+        if (isEmpty()) {
+            throw underflow_error("List is empty. Can't pop");
+        }
+        Node<T>* temp = tail;
+        tail = tail->prev;
+        if (tail != NULL) {
+            tail->next = NULL;
+        }
+        else {
+            head = NULL;
+        }//原来的表只有一个元素
+        delete temp;
+    }//删除表尾
+
+    T front() {
+        if (isEmpty()) {
+            throw underflow_error("List is empty. Can't get front");
+        }
+        return head->data;
+    }//获取表头
+
+    T back() {
+        if (isEmpty()) {
+            throw underflow_error("List is empty. Can't get back");
+        }
+        return tail->data;
+    }//获取表尾
+
+    void insert(int position, T data) {
+        if (position < 0) {
+            throw out_of_range("Invalid position. Can't insert");
+        }
+        if (position == 0) {
+            push_front(data);
+        }
+        else if (position >= size()) { // 如果位置大于或等于链表的大小，则在尾部插入
+            push_back(data);
+        }
+        else { // 在链表中间插入
+            Node<T>* temp = head;
+            for (int i = 0; i < position - 1; i++) { // 找到插入位置的前一个节点
+                temp = temp->next;
+            }
+            Node<T>* newNode = new Node<T>(data, temp->next, temp); // 创建新节点
+            temp->next->prev = newNode; // 更新插入位置节点的前驱
+            temp->next = newNode; // 更新前一个节点的后继
+        }
+    }//插入元素
+
+    Node<T>* begin() { // 返回指向第一个元素的迭代器
+        return head;
+    }
+
+    Node<T>* end() { // 返回指向最后一个元素之后的迭代器
+        return NULL; // 在双向链表中，最后一个元素的后继是NULL
+    }
+
+    int size() {
+        int count = 0;
+        for (Node<T>* temp = head; temp != end(); temp = temp->next) {
+            count++;
+        }
+        return count;
+    }//计算大小
+
+};
+
+int main() {
+    try {
+        List<int> list;
+        list.push_front(10);
+        list.push_back(20);
+        list.push_front(30);
+        list.insert(1, 40); // 在位置1插入40
+
+        cout << "Size of list: " << list.size() << endl; // 输出链表大小
+
+        while (!list.isEmpty()) {
+            cout << list.front() << " ";
+            list.pop_front();
+        }
+    }
+    catch (const exception& e) { // 捕获所有异常
+        cerr << "Caught exception: " << e.what() << endl;
+    }
+
+    cout << endl;
+    return 0;
+}
